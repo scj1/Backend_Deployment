@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
 //get got displaying
 router.get("/display", async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT Call_Later_Data_ID, Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Contact_Date FROM call_later;");
+        const [rows] = await db.query("SELECT Call_Later_Data_ID, Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date FROM call_later WHERE Active_Status = '2';");
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -71,46 +71,6 @@ router.patch("/:id", async (req, res) => {
 });
 
 
-
-
-
-/* router.post('/', (req, res) => {
-    const {
-        Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Contact_Date, Created_By, Updated_By
-    } = req.body;
-
-    const sql = `
-      INSERT INTO call_later (
-        Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Contact_Date,
-        Created_By,
-        Updated_By
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
-    const values = [
-        Parent_Name,
-        Student_Name,
-        Contact,
-        Comments,
-        Lead_Source_Code,
-        EOD,
-        Contact_Date,
-        Created_By,
-        Updated_By
-    ];
-
-    db.query(sql, values, (err, result) => {
-        if (err) {
-            console.error('Error inserting data:', err);
-            return res.status(500).json({ error: 'Database insert error' });
-        }
-
-        res.status(201).json({
-            message: 'Record inserted successfully',
-            Call_Later_Data_ID: result.insertId
-        });
-    });
-}); */
 
 router.post("/", async (req, res) => {
   try {
