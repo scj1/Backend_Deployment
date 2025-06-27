@@ -4,7 +4,7 @@ const db = require("../config/db");
 
 router.get("/", async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT * FROM dump");
+        const [rows] = await db.query("SELECT * FROM dump WHERE Active_Status = '3'");
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
 
 router.get("/display", async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT Dump_ID, Parent_Name, Student_Name, Phone_Number, Comments, Lead_Source_Code, EOD, Call_Date FROM dump;");
+        const [rows] = await db.query("SELECT Dump_ID, Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date FROM dump;");
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -68,32 +68,40 @@ router.patch("/:id", async (req, res) => {
 
 });
 
-router.post("/", (req, res) => {
-  const { 
-    Dumped_Date, 
-    Parent_Name,
-    Student_Name,
-    Phone_Number,
-    Lead_Source_Code,
-    Comments,
-    Status,
-    EOD,
-    Call_Date,
-    Created_By} = req.body;
+router.post("/", async (req, res) => {
+  try {
+    const {
+      Dumped_Date, Parent_Name, Student_Name, Contact,
+      Email, Lead_Source_Code, Comments, Status,
+      EOD, Call_Date, Created_By
+    } = req.body;
 
-  if (!Parent_Name || !Phone_Number || !Status || !EOD || !Lead_Source_Code || !Dumped_Date || !Comments || !Created_By) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  db.query(
-    "INSERT INTO dump (Dumped_Date, Parent_Name,Student_Name,Phone_Number,Lead_Source_Code,Comments,Status,EOD,Call_Date,Created_By) VALUES (?, ?, ?, ?,?,?,?,?,?,?)",
-    [Dumped_Date, Parent_Name,Student_Name,Phone_Number,Lead_Source_Code,Comments,Status,EOD,Call_Date,Created_By],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.status(200);
+    if (!Parent_Name || !Contact || !Email || !Status || !EOD ||
+        !Lead_Source_Code || !Dumped_Date || !Comments ||
+        !Created_By || !Student_Name || !Call_Date) {
+      return res.status(400).json({ error: "Missing required fields" });
     }
-  );
+
+    await db.query(
+      `INSERT INTO dump (
+        Dumped_Date, Parent_Name, Student_Name, Contact,
+        Email, Lead_Source_Code, Comments, Status,
+        EOD, Call_Date, Created_By
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        Dumped_Date, Parent_Name, Student_Name, Contact,
+        Email, Lead_Source_Code, Comments, Status,
+        EOD, Call_Date, Created_By
+      ]
+    );
+
+    res.status(200).json({ message: "Dump created successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
+
 
 
 router.delete("/:id", async (req, res) => {
