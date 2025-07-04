@@ -21,6 +21,26 @@ router.get("/display", async (req, res) => {
     }
 });
 
+
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        if (!Number.isInteger(id) || id <= 0) {
+            return res.status(400).json({ error: "Invalid Index Number" });
+        }
+
+        const [existing] = await db.query("SELECT * FROM students WHERE Index_Number = ?", [id]);
+        if (existing.length === 0) {
+            return res.status(404).json({ error: "Student not found" });
+        }
+
+        await db.query("DELETE FROM students WHERE Index_Number = ?", [id]);
+        res.json({ message: "Student deleted successfully" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // 2. Get a student by Index_Number
 router.get("/:id", async (req, res) => {
     try {
@@ -43,24 +63,7 @@ router.get("/:id", async (req, res) => {
 
 
 // 3. Delete a student
-router.delete("/:id", async (req, res) => {
-    try {
-        const id = parseInt(req.params.id, 10);
-        if (!Number.isInteger(id) || id <= 0) {
-            return res.status(400).json({ error: "Invalid Index Number" });
-        }
 
-        const [existing] = await db.query("SELECT * FROM students WHERE Index_Number = ?", [id]);
-        if (existing.length === 0) {
-            return res.status(404).json({ error: "Student not found" });
-        }
-
-        await db.query("DELETE FROM students WHERE Index_Number = ?", [id]);
-        res.json({ message: "Student deleted successfully" });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
 
 // 4. Create a student
 router.post("/", async (req, res) => {
