@@ -17,7 +17,7 @@ const studentsRoutes = require("./routes/students");
 const attendanceRoutes = require("./routes/attendance");
 require("dotenv").config();
 const app = express();
-const port = 20333;
+const port = 3000;
   
 // Middleware
 app.use(cors());
