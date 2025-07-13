@@ -37,7 +37,7 @@ router.get("/display", async (req, res) => {
         const [rows] = await db.query(`
             SELECT 
                 Recruitment_Data_ID,
-                Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date, Status,
+                Parent_Name, Student_Name, Contact, Email, Comments, Lead_Source_Code, EOD, Call_Date, Status,
                 Created_On,
                 Updated_On
             FROM pre_recruitment_data
@@ -66,7 +66,7 @@ router.get("/:id", async (req, res) => {
         const [results] = await db.query(`
             SELECT 
                 Recruitment_Data_ID,
-                Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date, Status
+                Parent_Name, Student_Name, Contact, Email, Comments, Lead_Source_Code, EOD, Call_Date, Status
             FROM pre_recruitment_data 
             WHERE Recruitment_Data_ID = ? AND Active_Status = '1'
         `, [id]);
