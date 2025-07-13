@@ -15,12 +15,51 @@ router.get("/", async (req, res) => {
 //get got displaying
 router.get("/display", async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT Call_Later_Data_ID, Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date FROM call_later WHERE Active_Status = '2';");
+        const [rows] = await db.query("SELECT Call_Later_Data_ID, Parent_Name, Student_Name, Contact, Email, Comments, Lead_Source_Code, EOD, Call_Date FROM call_later WHERE Active_Status = '2';");
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
+router.get("/:id", async (req, res) => {
+    try {
+        console.log('GET /call-later/:id route hit with ID:', req.params.id);
+        const id = req.params.id;
+
+        if (isNaN(id)) {
+            console.log('Invalid ID detected:', id);
+            return res.status(400).json({ error: "Invalid ID" });
+        }
+
+        console.log('Executing query for ID:', id);
+        const [results] = await db.query(`
+            SELECT 
+                Call_Later_Data_ID,
+                Parent_Name, Student_Name, Contact, Comments, Lead_Source_Code, EOD, Call_Date, Status
+            FROM call_later 
+            WHERE Call_Later_Data_ID = ? AND Active_Status = '2'
+        `, [id]);
+
+        console.log('Query results:', results);
+
+        if (results.length === 0) {
+            console.log('No active results found for ID:', id);
+            return res.status(404).json({ error: "Data not found" });
+        }
+
+        console.log('Sending response for ID:', id);
+        res.json(results[0]);
+    } catch (err) {
+        console.error('Database error details:', {
+            message: err.message,
+            code: err.code,
+            stack: err.stack
+        });
+        res.status(500).json({ error: err.message });
+    }
+});
+
 
 //update
 router.patch("/:id", async (req, res) => {
